@@ -1,0 +1,43 @@
+﻿@model List<CampusLink_Application.Models.Student>
+
+@{
+    ViewData["Title"] = "Student List";
+}
+
+<h2 class="text-secondary mb-4">Registered Students</h2>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No students registered yet.</p>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Age</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in Model)
+            {
+                <tr>
+                    <td>@student.Id</td>
+                    <td>@student.Name</td>
+                    <td>@student.Gender</td>
+                    <td>@student.Age</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@student.Id" class="btn btn-sm btn-warning">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@student.Id" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+<button type="button" onclick="history.back()" class="btn btn-primary">Back</button>
+<button type="button" onclick="window.location.href='/'" class="btn btn-danger ms-lg-5">Exit</button>

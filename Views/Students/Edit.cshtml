@@ -1,0 +1,28 @@
+﻿@model CampusLink_Application.Models.Student
+
+@{
+    ViewData["Title"] = "Edit Student";
+}
+
+<h2 class="text-warning mb-3">Edit Student Details</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Name</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Gender" class="form-label">Gender</label>
+        <select asp-for="Gender" class="form-select">
+            <option>Male</option>
+            <option>Female</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Age" class="form-label">Age</label>
+        <input asp-for="Age" class="form-control" type="number" />
+    </div>
+    <button type="submit" class="btn btn-success">Update</button>
+</form>

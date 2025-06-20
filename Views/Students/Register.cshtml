@@ -1,0 +1,31 @@
+﻿@model CampusLink_Application.Models.Student
+
+@{
+    ViewData["Title"] = "Register Student";
+}
+
+<h2 class="text-info text-center">Register New Student</h2>
+
+<form asp-action="Register" method="post" class="mt-3">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Name</label>
+        <input asp-for="Name" required class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Gender" class="form-label">Gender</label>
+        <select asp-for="Gender" required class="form-select">
+            <option>Male</option>
+            <option>Female</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Age" class="form-label">Age</label>
+        <input asp-for="Age" required class="form-control" type="number" />
+    </div>
+
+    <button type="submit" class="btn btn-primary ms-5">Add Student</button>
+    <button type="button" onclick="history.back()" class="btn btn-primary ms-5">Back</button>
+    <button type="button" onclick="window.location.href='/'" class="btn btn-danger ms-5">Exit</button>
+</form>
