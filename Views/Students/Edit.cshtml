@@ -8,10 +8,19 @@
 
 <form asp-action="Edit" method="post">
     <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label asp-for="ProfilePicture" class="form-label">Profile Picture</label>
+        <input asp-for="ProfilePicture" type="file" class="form-control" />
+        <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+    </div>
 
     <div class="mb-3">
-        <label asp-for="Name" class="form-label">Name</label>
-        <input asp-for="Name" class="form-control" />
+        <label asp-for="FirstName" class="form-label">First Name</label>
+        <input asp-for="FirstName" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="LastName" class="form-label">Last Name</label>
+        <input asp-for="LastName" class="form-control" />
     </div>
     <div class="mb-3">
         <label asp-for="Gender" class="form-label">Gender</label>
@@ -23,6 +32,28 @@
     <div class="mb-3">
         <label asp-for="Age" class="form-label">Age</label>
         <input asp-for="Age" class="form-control" type="number" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Age" class="form-label">Age</label>
+        <input asp-for="Age" required class="form-control" type="number" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="EmailAdress" class="form-label">Email Address</label>
+        <input asp-for="EmailAdress" required class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+        <input asp-for="PhoneNumber" required class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="RegNo" class="form-label">Registration Number</label>
+        <input asp-for="RegNo" required class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="BirthDate" class="form-label">Date Of Birth</label>
+        <input asp-for="BirthDate" required class="form-control" type="date" />
+
     </div>
     <button type="submit" class="btn btn-success">Update</button>
 </form>
