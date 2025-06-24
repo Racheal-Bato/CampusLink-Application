@@ -58,12 +58,32 @@ namespace CampusLink_Application.Controllers
                 student.PhoneNumber = updated.PhoneNumber;
                 student.RegNo = updated.RegNo;
                 student.EmailAdress = updated.EmailAdress;
-                student.ProfilePicturePath = updated.ProfilePicturePath;
+                student.ProfileImage = updated.ProfileImage;
                
                 _context.SaveChanges();
             }
             return RedirectToAction("List");
         }
+        [HttpPost]
+        public async Task<IActionResult> Upload(IFormFile ImageFile)
+        {
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                var fileName = Path.GetFileName(ImageFile.FileName);
+                var filePath = Path.Combine("wwwroot/images", fileName); // Adjust as needed
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await ImageFile.CopyToAsync(stream);
+                }
+
+                // Save file name to database if needed
+                return RedirectToAction("Success");
+            }
+
+            return View();
+        }
+
 
         public IActionResult Delete(int id)
         {
