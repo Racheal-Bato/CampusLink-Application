@@ -5,7 +5,7 @@
 namespace CampusLink_Application.Migrations
 {
     /// <inheritdoc />
-    public partial class AddStudentContactDetails : Migration
+    public partial class CoursesAdded : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

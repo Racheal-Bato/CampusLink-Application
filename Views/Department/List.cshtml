@@ -1,0 +1,56 @@
+﻿@model IEnumerable<CampusLink_Application.Models.Department>
+
+@{
+    ViewData["Title"] = "Department List";
+}
+
+<div class="container">
+    <h2 class="text-center text-primary mb-4">Registered Departments</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="text-end mb-3">
+        <a asp-action="Register" class="btn btn-success">Add New Department</a>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Department Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                int count = 1;
+                foreach (var department in Model)
+                {
+                    <tr>
+                        <td>@count</td>
+                        <td>@department.DepartmentName</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@department.Id" class="btn btn-warning btn-sm me-1">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@department.Id" class="btn btn-danger btn-sm"
+                               onclick="return confirm('Are you sure you want to delete this department?');">Delete</a>
+                        </td>
+                    </tr>
+                    count++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center">No departments available.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

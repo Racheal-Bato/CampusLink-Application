@@ -12,21 +12,12 @@
             <input type="hidden" asp-for="Id" />
 
             <div class="mb-3 text-center">
-                <label asp-for="ProfilePicture" class="form-label">Profile Picture</label>
+                <label asp-for="ProfileImage" class="form-label">Profile Picture</label>
 
-                @* Show current picture if one exists *@
-                @if (!string.IsNullOrEmpty(Model.ProfileImage))
-                {
-                    <img src="@Url.Content(Model.ProfileImage)" alt="Current Profile Picture"
-                          />
-                }
-                else
-                {
-                    <p class="text-muted">No profile picture uploaded.</p>
-                }
 
-                <input asp-for="ProfilePicture" type="file" class="form-control mt-2 img-thumbnail mb-2" style="width: 150px; height: 150px; object-fit: cover;" accept="image/*" />
-                <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+
+                <input asp-for="ProfileImage" type="file" class="form-control mt-2 " accept="image/*" />
+                <span asp-validation-for="ProfileImage" class="text-danger"></span>
             </div>
 
 
@@ -38,6 +29,7 @@
             <div class="mb-3">
                 <label asp-for="LastName" class="form-label">Last Name</label>
                 <input asp-for="LastName" class="form-control" />
+
             </div>
 
             <div class="mb-3">
@@ -72,6 +64,23 @@
             <div class="mb-3">
                 <label asp-for="BirthDate" class="form-label">Date Of Birth</label>
                 <input asp-for="BirthDate" class="form-control" type="date" />
+            </div>
+            <div class="form-group">
+                <label asp-for="CourseId">Course</label>
+                <select asp-for="CourseId" class="form-control" asp-items="@(new SelectList(ViewBag.Courses, "CourseId", "CourseName", Model.CourseId))">
+                    <option value="">-- Select Course --</option>
+                    
+                </select>
+                <span asp-validation-for="CourseId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Id">Department</label>
+                <select asp-for="Id" class="form-control" asp-items="@(new SelectList(ViewBag.Departments, "Id", "DepartmentName", Model.Id))">
+                    <option value="">-- Select Department --</option>
+
+                </select>
+                <span asp-validation-for="Id" class="text-danger"></span>
             </div>
 
             <div class="d-flex justify-content-between">

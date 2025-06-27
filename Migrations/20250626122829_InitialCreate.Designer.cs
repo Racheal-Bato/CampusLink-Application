@@ -4,6 +4,7 @@ using CampusLink_Application.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CampusLink_Application.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250626122829_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,14 +33,8 @@ namespace CampusLink_Application.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseId"));
 
-                    b.Property<string>("CourseCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CourseName")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("Duration")
-                        .HasColumnType("int");
 
                     b.HasKey("CourseId");
 
@@ -94,9 +91,6 @@ namespace CampusLink_Application.Migrations
 
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PhoneNumber")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

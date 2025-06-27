@@ -1,8 +1,97 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Welcome";
+    Layout = "_Layout";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@section Styles {
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Background image */
+        .hero-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: url('/images/campus-background.jpg') no-repeat center center;
+            background-size: cover;
+            z-index: -3; /* lower so it stays behind everything */
+        }
+
+        /* Semi-transparent overlay */
+        .hero-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: -2; /* must be behind navbar and content */
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 56px); /* adjust if navbar height changes */
+            color: #f0f0f0;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.7);
+            padding: 0 1rem;
+        }
+
+            .hero-content h1 {
+                font-size: 3.5rem;
+                font-weight: 700;
+                margin-bottom: 0.75rem;
+                color: #ffe66d;
+            }
+
+            .hero-content p {
+                font-size: 1.25rem;
+                margin-bottom: 2rem;
+                max-width: 600px;
+                text-align: center;
+                color: #e0e0e0;
+            }
+
+            .hero-content .btn-primary {
+                background-color: #198754;
+                border-color: #198754;
+                color: #fff;
+            }
+
+                .hero-content .btn-primary:hover {
+                    background-color: #157347;
+                    border-color: #146c43;
+                }
+
+            .hero-content .btn-outline-success {
+                color: #198754;
+                border-color: #198754;
+            }
+
+                .hero-content .btn-outline-success:hover {
+                    background-color: rgba(25,135,84,0.1);
+                }
+    </style>
+}
+
+<div class="hero-bg"></div>
+<div class="hero-overlay"></div>
+
+<div class="hero-content container text-center">
+    <h1>Welcome to CampusLink</h1>
+    <p>Your one-stop portal for managing students, courses, lecturers, and departments with ease.</p>
+    <div>
+        <a asp-controller="Students" asp-action="List" class="btn btn-lg btn-primary me-3">View Students</a>
+        <a asp-controller="Course" asp-action="List" class="btn btn-lg btn-outline-success">View Courses</a>
+    </div>
 </div>

@@ -1,0 +1,61 @@
+﻿@model IEnumerable<CampusLink_Application.Models.Lecturer>
+
+@{
+    ViewData["Title"] = "Lecturer List";
+}
+
+<div class="container">
+    <h2 class="text-center text-primary mb-4">Registered Lecturers</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="text-end mb-3">
+        <a asp-action="Register" class="btn btn-success">Add New Lecturer</a>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Department</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                int count = 1;
+                foreach (var lecturer in Model)
+                {
+                    <tr>
+                        <td>@count</td>
+                        <td>@lecturer.FirstName @lecturer.LastName</td>
+                        <td>@lecturer.Email</td>
+                        <td>@lecturer.PhoneNumber</td>
+                        <td>@lecturer.Department?.DepartmentName</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@lecturer.Id" class="btn btn-warning btn-sm me-1">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@lecturer.Id" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this lecturer?');">Delete</a>
+                        </td>
+                    </tr>
+                    count++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center">No lecturers found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

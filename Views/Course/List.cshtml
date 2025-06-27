@@ -1,0 +1,48 @@
+﻿@model List<CampusLink_Application.Models.Course>
+
+@{
+    ViewData["Title"] = "Course List";
+}
+
+<div class="container mt-4">
+    <h2 class="text-primary text-center mb-4">Registered Courses</h2>
+
+    <div class="text-end mb-3">
+        <a asp-action="Register" class="btn btn-success">Add New Course</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <table class="table table-bordered table-striped">
+            <thead class="table-success">
+                <tr>
+                    <th>Course Name</th>
+                    <th>Course Code</th>
+                    <th>Duration (years)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var course in Model)
+                {
+                    <tr>
+                        <td>@course.CourseName</td>
+                        <td>@course.CourseCode</td>
+                        <td>@course.Duration</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@course.CourseId" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@course.CourseId" class="btn btn-danger btn-sm"
+                               onclick="return confirm('Are you sure you want to delete this course?');">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info">No courses registered yet.</div>
+    }
+</div>

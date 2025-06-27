@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Http;
+
+
 
 namespace CampusLink_Application.Models
 {
@@ -9,16 +10,28 @@ namespace CampusLink_Application.Models
         public int Id { get; set; } // Unique ID (simulate index)
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Gender { get; set; }    
+        public string Gender { get; set; }
         public int Age { get; set; }
         public string RegNo { get; set; }
         public DateTime? BirthDate { get; set; }
         public string EmailAdress { get; set; }
         public int? PhoneNumber { get; set; }
-        public string ProfileImage { get; set; }
+        public byte[]? ProfileImage { get; set; }
 
-        // This will hold the uploaded file, not stored in the database
+        public int CourseId { get; set; }         // One-to-Many
+        public Course Course { get; set; }
+
+        public int DepartmentId { get; set; }     // One-to-Many
+        public Department Department { get; set; }
+
         [NotMapped]
-        public IFormFile ProfilePicture { get; set; }
+        public IFormFile? ImageFile { get; set; }
+        
+
     }
+    
+   
+
+
+
 }

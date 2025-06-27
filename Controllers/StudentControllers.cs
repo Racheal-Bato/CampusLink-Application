@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CampusLink_Application.Data;
 using CampusLink_Application.Models;
-using CampusLink_Application.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace CampusLink_Application.Controllers
@@ -21,26 +22,48 @@ namespace CampusLink_Application.Controllers
 
         public IActionResult List()
         {
-            var students = _context.Students.ToList();
+            var students = _context.Students
+                .Include(s => s.Course)
+                .Include(s => s.Department)
+                .ToList();
             return View(students);
         }
 
         public IActionResult Register()
         {
+            ViewBag.Courses = _context.Courses.ToList();
+            ViewBag.Departments = _context.Departments.ToList();
             return View();
+
         }
 
-        [HttpPost]
-        public IActionResult Register(Student student)
+              [HttpPost]
+        public async Task<IActionResult> Register(Student student, IFormFile ImageFile)
         {
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await ImageFile.CopyToAsync(memoryStream);
+                    student.ProfileImage = memoryStream.ToArray(); // Set image to model
+                }
+            }
+
             _context.Students.Add(student);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
             return RedirectToAction("List");
         }
+
 
         public IActionResult Edit(int id)
         {
             var student = _context.Students.Find(id);
+            if (student == null) return NotFound();
+
+            ViewBag.Courses = _context.Courses.ToList();
+            ViewBag.Departments = _context.Departments.ToList();
+
             return View(student);
         }
 
@@ -50,6 +73,7 @@ namespace CampusLink_Application.Controllers
             var student = _context.Students.Find(updated.Id);
             if (student != null)
             {
+
                 student.FirstName = updated.FirstName;
                 student.LastName = updated.LastName;
                 student.Gender = updated.Gender;
@@ -58,31 +82,14 @@ namespace CampusLink_Application.Controllers
                 student.PhoneNumber = updated.PhoneNumber;
                 student.RegNo = updated.RegNo;
                 student.EmailAdress = updated.EmailAdress;
-                student.ProfileImage = updated.ProfileImage;
-               
+                student.CourseId = updated.CourseId;
+                student.DepartmentId = updated.DepartmentId;
+
                 _context.SaveChanges();
             }
             return RedirectToAction("List");
         }
-        [HttpPost]
-        public async Task<IActionResult> Upload(IFormFile ImageFile)
-        {
-            if (ImageFile != null && ImageFile.Length > 0)
-            {
-                var fileName = Path.GetFileName(ImageFile.FileName);
-                var filePath = Path.Combine("wwwroot/images", fileName); // Adjust as needed
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await ImageFile.CopyToAsync(stream);
-                }
-
-                // Save file name to database if needed
-                return RedirectToAction("Success");
-            }
-
-            return View();
-        }
+        
 
 
         public IActionResult Delete(int id)

@@ -25,13 +25,18 @@ else
                 <th>Registration Number</th>
                 <th>Email Address</th>
                 <th>Phone Number</th>
-                <th>Actions</th>
+                <th>Course</th>
+                <th>Department</th>
+                <th>Profile Image</th>
+                <th>Action</th>
+                
             </tr>
         </thead>
         <tbody>
             @foreach (var student in Model)
             {
                 <tr>
+
                     <td>@student.Id</td>
                     <td>@student.FirstName</td>
                     <td>@student.LastName</td>
@@ -41,6 +46,18 @@ else
                     <td>@student.RegNo</td>
                     <td>@student.EmailAdress</td>
                     <td>@student.PhoneNumber</td>
+                    <td>@student.Course?.CourseName</td>
+                    <td>@student.Department?.DepartmentName</td>
+
+                    <td>
+                        @if (student.ProfileImage != null)
+                        {
+                            <img src="data:image/png;base64,@Convert.ToBase64String(student.ProfileImage)" width="100" />
+                        }
+                        else
+                        {
+                            <span>No Image</span>
+                        }
 
                     <td>
                         <a asp-action="Edit" asp-route-id="@student.Id" class="btn btn-sm btn-warning">Edit</a>
