@@ -1,45 +1,82 @@
-﻿using CampusLink_Application.Data;
-using CampusLink_Application.Models;
+﻿using CampusLink_Application.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace CampusLink_Application.Controllers
 {
     public class AccountController : Controller
     {
-       
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
+
+        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        {
+            _userManager = userManager;
+            _signInManager = signInManager;
+        }
+
+        // GET: /Account/Register
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        // POST: /Account/Register
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var user = new IdentityUser { UserName = model.Email, Email = model.Email };
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            if (result.Succeeded)
+            {
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction("Index", "Home");
+            }
+
+            foreach (var error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+
+            return View(model);
+        }
+
         // GET: /Account/Login
-        public IActionResult LogIn()
+        public IActionResult Login()
         {
             return View();
         }
 
         // POST: /Account/Login
         [HttpPost]
-        public IActionResult LogIn(Account model)
+        public async Task<IActionResult> Login(LogInViewModel model)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return View(model);
+
+            var result = await _signInManager.PasswordSignInAsync(
+                model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
             {
+                ModelState.AddModelError("", "Invalid Email or Password!");
                 return View(model);
             }
 
-            // Dummy logic: Replace this with your actual authentication code
-            if (model.Email == "admin@example.com" && model.Password == "password123")
-            {
-                // Normally you'd sign in the user here using ASP.NET Core Identity
-                TempData["Success"] = "Login successful!";
-                return RedirectToAction("Index", "Home"); // or wherever you want to go after login
-            }
 
-            ModelState.AddModelError("", "Invalid email or password");
+            if (result.Succeeded)
+                return RedirectToAction("Index", "Home");
+
+            ModelState.AddModelError("", "Invalid login attempt");
             return View(model);
+
         }
 
-        // Optional: Log out method
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            // Sign out logic goes here
-            return RedirectToAction("LogIn");
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Login");
         }
     }
 }
-

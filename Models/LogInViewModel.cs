@@ -2,16 +2,19 @@
 
 namespace CampusLink_Application.Models
 {
-    public class Account
+    using System.ComponentModel.DataAnnotations;
+
+    public class LogInViewModel
     {
-        public int Id { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
         public bool RememberMe { get; set; }
     }
+
 }

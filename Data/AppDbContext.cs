@@ -1,13 +1,14 @@
-﻿using CampusLink_Application.Models;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+using CampusLink_Application.Models;
+
 
 namespace CampusLink_Application.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-        public DbSet<User> Users { get; set; }
+        public DbSet<RegisterViewModel> Users { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<Lecturer> Lecturers{ get; set; }

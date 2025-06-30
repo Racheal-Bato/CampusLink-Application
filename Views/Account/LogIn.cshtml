@@ -1,4 +1,4 @@
-﻿@model CampusLink_Application.Models.Account
+﻿@model CampusLink_Application.Models.LogInViewModel
 
 @{
     ViewData["Title"] = "Login";
@@ -15,7 +15,9 @@
         </div>
     }
 
-    <form asp-action="Login" method="post" novalidate>
+    <form asp-action="Login" asp-controller="Account" method="post" novalidate>
+        <div asp-validation-summary="All" class="text-danger"></div>
+
         <div class="mb-3">
             <label asp-for="Email" class="form-label"></label>
             <input asp-for="Email" class="form-control" />
@@ -33,7 +35,7 @@
             <label asp-for="RememberMe" class="form-check-label"></label>
         </div>
 
-        <button type="submit" class="btn btn-primary w-100">Log In</button>
+        <button type="submit" class="btn btn-primary w-100" >Log In</button>
     </form>
 
     <div class="mt-3 text-center">

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CampusLink_Application.Models
 {
-    public class User
+    public class RegisterViewModel
     {
         public int Id { get; set; }
 
