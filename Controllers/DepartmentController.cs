@@ -1,5 +1,6 @@
 ﻿using CampusLink_Application.Data;
 using CampusLink_Application.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -13,12 +14,16 @@ namespace CampusLink_Application.Controllers
         {
             _context = context;
         }
+        [Authorize(Roles = "Admin")]
+
         public IActionResult List()
         {
             var departments = _context.Departments.ToList();
 
             return View(departments);
         }
+        [Authorize(Roles = "Admin,lecturer,student")]
+
         public IActionResult Register()
         {
            
@@ -35,6 +40,8 @@ namespace CampusLink_Application.Controllers
 
             return RedirectToAction("List");
         }
+        [Authorize(Roles = "Admin")]
+
         public IActionResult Edit(int id)
         {
             var department = _context.Departments.Find(id);
@@ -47,6 +54,8 @@ namespace CampusLink_Application.Controllers
             return View(department);
         }
         [HttpPost]
+        [Authorize(Roles = "Admin")]
+
         public IActionResult Edit(Department updated)
         {
             var department = _context.Departments.Find(updated.Id);
@@ -61,6 +70,9 @@ namespace CampusLink_Application.Controllers
             }
             return RedirectToAction("List");
         }
+
+        [Authorize(Roles = "Admin")]
+
         public IActionResult Delete(int id)
         {
             var department = _context.Departments.Find(id);

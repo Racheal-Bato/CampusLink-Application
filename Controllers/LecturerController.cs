@@ -1,5 +1,6 @@
 ﻿using CampusLink_Application.Data;
 using CampusLink_Application.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 namespace CampusLink_Application.Controllers
@@ -12,6 +13,8 @@ namespace CampusLink_Application.Controllers
         {
             _context = context;
         }
+        [Authorize(Roles = "Admin")]
+
         public IActionResult List()
         {
             var lecturers = _context.Lecturers
@@ -20,6 +23,7 @@ namespace CampusLink_Application.Controllers
 
             return View(lecturers);
         }
+        [Authorize(Roles = "Lecturer")]
 
         public IActionResult Register()
         {
@@ -35,6 +39,8 @@ namespace CampusLink_Application.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("List");
         }
+        
+
         public IActionResult Edit(int id)
         {
             var lecturer = _context.Lecturers.Find(id);
@@ -66,6 +72,8 @@ namespace CampusLink_Application.Controllers
             }
             return RedirectToAction("List");
         }
+        [Authorize(Roles = "Admin")]
+
         public IActionResult Delete(int id)
         {
             var lecturer = _context.Lecturers.Find(id);
