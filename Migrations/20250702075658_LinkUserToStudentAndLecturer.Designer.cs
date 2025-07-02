@@ -4,6 +4,7 @@ using CampusLink_Application.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CampusLink_Application.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250702075658_LinkUserToStudentAndLecturer")]
+    partial class LinkUserToStudentAndLecturer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,9 +109,7 @@ namespace CampusLink_Application.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("StudentId")
-                        .IsUnique()
-                        .HasFilter("[StudentId] IS NOT NULL");
+                    b.HasIndex("StudentId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -189,10 +190,6 @@ namespace CampusLink_Application.Migrations
                     b.Property<int?>("PhoneNumber")
                         .HasColumnType("int");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
@@ -239,13 +236,6 @@ namespace CampusLink_Application.Migrations
                         .HasColumnType("varbinary(max)");
 
                     b.Property<string>("RegNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RegistrationNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -394,13 +384,11 @@ namespace CampusLink_Application.Migrations
                 {
                     b.HasOne("CampusLink_Application.Models.Lecturer", "Lecturer")
                         .WithOne("ApplicationUser")
-                        .HasForeignKey("CampusLink.Models.ApplicationUser", "LecturerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("CampusLink.Models.ApplicationUser", "LecturerId");
 
                     b.HasOne("CampusLink_Application.Models.Student", "Student")
-                        .WithOne("ApplicationUser")
-                        .HasForeignKey("CampusLink.Models.ApplicationUser", "StudentId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey("StudentId");
 
                     b.Navigation("Lecturer");
 
@@ -526,11 +514,6 @@ namespace CampusLink_Application.Migrations
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("CourseLecturers");
-                });
-
-            modelBuilder.Entity("CampusLink_Application.Models.Student", b =>
-                {
-                    b.Navigation("ApplicationUser");
                 });
 #pragma warning restore 612, 618
         }

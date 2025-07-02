@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using CampusLink_Application.Models;
+using CampusLink.Models;
 
 
 namespace CampusLink_Application.Data
 {
-    public class AppDbContext : IdentityDbContext
+    public class AppDbContext: IdentityDbContext<ApplicationUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
        
@@ -33,6 +34,22 @@ namespace CampusLink_Application.Data
                 .HasOne(cl => cl.Lecturer)
                 .WithMany(l => l.CourseLecturers)
                 .HasForeignKey(cl => cl.LecturerId);
+            
+
+            // One-to-one ApplicationUser <-> Student
+            modelBuilder.Entity<ApplicationUser>()
+                .HasOne(a => a.Student)
+                .WithOne(s => s.ApplicationUser)
+                .HasForeignKey<ApplicationUser>(a => a.StudentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // One-to-one ApplicationUser <-> Lecturer
+            modelBuilder.Entity<ApplicationUser>()
+                .HasOne(a => a.Lecturer)
+                .WithOne(l => l.ApplicationUser)
+                .HasForeignKey<ApplicationUser>(a => a.LecturerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
 
 

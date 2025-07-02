@@ -1,28 +1,41 @@
-﻿using CampusLink_Application.Models;
+﻿#nullable enable
+
+using CampusLink.Models;
+using CampusLink_Application.Data;
+using CampusLink_Application.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace CampusLink_Application.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
+        private readonly AppDbContext _context;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IEmailSender emailSender )
+        // ✅ FIX: Inject _context in the constructor
+        public AccountController(
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            IEmailSender emailSender,
+            AppDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
-            
+            _context = context;
         }
 
         // GET: /Account/Register
         public IActionResult Register()
         {
+            ViewBag.Roles = new List<string> { "Student", "Lecturer" };
+            ViewBag.Departments = _context.Departments.Select(d => d.DepartmentName).ToList();
+            
             return View();
         }
 
@@ -30,45 +43,86 @@ namespace CampusLink_Application.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+            ViewBag.Roles = new List<string> { "Student", "Lecturer" };
+            ViewBag.Departments = _context.Departments.Select(d => d.DepartmentName).ToList();
+
             if (!ModelState.IsValid)
                 return View(model);
 
-            var user = new IdentityUser
+            var user = new ApplicationUser
             {
                 UserName = model.Email,
                 Email = model.Email
             };
 
+            // ✅ First create the user account
             var result = await _userManager.CreateAsync(user, model.Password);
 
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                // Assign the "Student" role by default
-                await _userManager.AddToRoleAsync(user, "Student");
-             
-                // Generate email confirmation token or  // Email confirmation logic...
-                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var confirmationLink = Url.Action(
-                    "ConfirmEmail",
-                    "Account",
-                    new { userId = user.Id, token = token },
-                    protocol: HttpContext.Request.Scheme);
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError("", error.Description);
 
-                // Simulate sending the email
-                var subject = "CampusLink Email Confirmation";
-                var body = $"Please confirm your email by <a href='{confirmationLink}'>clicking here</a>.";
-
-                await _emailSender.SendEmailAsync(model.Email, subject, body);
-
-
-                TempData["Success"] = "Account created successfully! Please check your email to confirm your account.";
-                return RedirectToAction("Login");
+                return View(model);
             }
 
-            foreach (var error in result.Errors)
-                ModelState.AddModelError("", error.Description);
+            // ✅ Role logic: Determine what role the user selected
+            if (model.Role == "Student")
+            {
+                var student = new Student
+                {
+                    RegNo = model.RegistrationNumber
+                };
 
-            return View(model);
+                _context.Students.Add(student);
+                await _context.SaveChangesAsync();
+
+                user.StudentId = student.Id;
+                await _userManager.UpdateAsync(user); // ✅ Save link
+                await _userManager.AddToRoleAsync(user, "Student");
+            }
+            else if (model.Role == "Lecturer")
+            {
+                // ✅ Get the department object first
+                var department = await _context.Departments
+                    .FirstOrDefaultAsync(d => d.DepartmentName == model.Department);
+
+                if (department == null)
+                {
+                    ModelState.AddModelError("", "Invalid department selected.");
+                    return View(model);
+                }
+
+                var lecturer = new Lecturer
+                {
+                    DepartmentId = department.Id
+                };
+
+                _context.Lecturers.Add(lecturer);
+                await _context.SaveChangesAsync();
+
+                user.LecturerId = lecturer.Id;
+                await _userManager.UpdateAsync(user); // ✅ Save link
+                await _userManager.AddToRoleAsync(user, "Lecturer");
+            }
+            if (model.Role == "Admin")
+            {
+
+            }
+                // ✅ Send confirmation email
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var confirmationLink = Url.Action(
+                "ConfirmEmail", "Account",
+                new { userId = user.Id, token },
+                protocol: HttpContext.Request.Scheme);
+
+            await _emailSender.SendEmailAsync(
+                model.Email,
+                "CampusLink Email Confirmation",
+                $"Please confirm your email by <a href='{confirmationLink}'>clicking here</a>.");
+
+            TempData["Success"] = "Account created successfully! Please check your email to confirm.";
+            return RedirectToAction("Login");
         }
 
         // GET: /Account/ConfirmEmail
@@ -85,11 +139,11 @@ namespace CampusLink_Application.Controllers
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (result.Succeeded)
             {
-                TempData["Success"] = "Email confirmed successfully! You can now log in.";
+                TempData["Success"] = "Email confirmed! You can now log in.";
                 return RedirectToAction("Login");
             }
 
-            TempData["Error"] = "Email confirmation failed. Please try again.";
+            TempData["Error"] = "Email confirmation failed.";
             return RedirectToAction("Index", "Home");
         }
 
@@ -107,15 +161,9 @@ namespace CampusLink_Application.Controllers
                 return View(model);
 
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
+            if (user == null || !await _userManager.IsEmailConfirmedAsync(user))
             {
-                ModelState.AddModelError("", "Invalid email or password.");
-                return View(model);
-            }
-
-            if (!await _userManager.IsEmailConfirmedAsync(user))
-            {
-                ModelState.AddModelError("", "You must confirm your email before logging in.");
+                ModelState.AddModelError("", "Invalid login or email not confirmed.");
                 return View(model);
             }
 

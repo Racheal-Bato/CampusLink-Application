@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CampusLink.Models;
+using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 
@@ -26,12 +28,20 @@ namespace CampusLink_Application.Models
 
         [NotMapped]
         public IFormFile? ImageFile { get; set; }
-        
+        public ApplicationUser? ApplicationUser { get; set; }
 
+        [Required]
+        public string Role { get; set; } // 👈 Add this
+
+        public string? RegistrationNumber { get; set; } // 👈 For Student
+      
     }
+
+
+}
     
    
 
 
 
-}
+

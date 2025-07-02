@@ -31,6 +31,12 @@ namespace CampusLink_Application.Models
         [Display(Name = "Confirm Password")]
         public string ConfirmPassword { get; set; }
 
+        [Required]
+        public string Role { get; set; } // 👈 Add this
+
+        public string? RegistrationNumber { get; set; } // 👈 For Student
+        public string? Department { get; set; } // 👈 For Lecturer
+
         public bool AgreeToTerms { get; set; }
     }
 }

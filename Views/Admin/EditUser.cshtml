@@ -1,0 +1,32 @@
+﻿@model CampusLink_Application.Models.EditUserViewModel
+@{
+    ViewData["Title"] = "Edit User Roles";
+}
+
+<h2 class="text-center mb-4">Edit User Roles</h2>
+
+<div class="container">
+    <form asp-action="EditUser" method="post">
+        <input type="hidden" asp-for="UserId" />
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label">Email</label>
+            <input asp-for="Email" class="form-control" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Select Roles</label>
+            @foreach (var role in Model.AllRoles)
+            {
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name="SelectedRoles" value="@role"
+                           @(Model.CurrentRoles.Contains(role) ? "checked" : "") />
+                    <label class="form-check-label">@role</label>
+                </div>
+            }
+        </div>
+
+        <button type="submit" class="btn btn-success">Save Changes</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>

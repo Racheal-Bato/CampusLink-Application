@@ -2,6 +2,7 @@ using CampusLink_Application.Data;
 using CampusLink_Application.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using CampusLink.Models;
 
 var builder = WebApplication.CreateBuilder(args); // ? Declare builder first
 
@@ -11,7 +12,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 
 // Add Identity services
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()  // You can customize the user class later if you want
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()  // You can customize the user class later if you want
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
@@ -31,23 +32,53 @@ builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
 
-async Task CreateRoles(IServiceProvider serviceProvider)
+
+// This method seeds roles and a default admin user
+async Task SeedRolesAndAdminAsync(IApplicationBuilder app)
 {
-    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    using var scope = app.ApplicationServices.CreateScope();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-    string[] roleNames = { "Admin", "Student", "Lecturer" };
-    foreach (var roleName in roleNames)
+    // Create admin user if it doesn't exist
+    string adminEmail = "admin@campuslink.com";
+    string adminPassword = "Admin123!"; // Change to a secure password
+
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+    if (adminUser == null)
     {
-        var roleExist = await roleManager.RoleExistsAsync(roleName);
-        if (!roleExist)
+        adminUser = new ApplicationUser
         {
-            await roleManager.CreateAsync(new IdentityRole(roleName));
+            UserName = adminEmail,
+            Email = adminEmail,
+            EmailConfirmed = true
+        };
+        var result = await userManager.CreateAsync(adminUser, adminPassword);
+        if (!result.Succeeded)
+        {
+            throw new Exception("Failed to create admin user");
         }
-    }
-}
+        await userManager.AddToRoleAsync(adminUser, "Admin");
 
-    // Configure the HTTP request pipeline.
-    if (!app.Environment.IsDevelopment())
+    }
+
+    // Define the roles you want in your system
+    string[] roles = { "Admin", "Lecturer", "Student" };
+
+    // Create roles if they don't already exist
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole(role));
+    }
+
+    // Create a default admin user if it doesn't exist
+    
+    }
+
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
@@ -67,7 +98,8 @@ app.MapControllerRoute(
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    await CreateRoles(services);
+    await SeedRolesAndAdminAsync(app);
+
 }
 
 

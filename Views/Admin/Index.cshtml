@@ -1,0 +1,53 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h3 class="mb-0">CampusLink Admin Dashboard</h3>
+                    <small>Manage users, roles & system settings</small>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row text-center">
+
+                        <div class="col-md-4 mb-4">
+                            <div class="p-4 bg-light border rounded-3 shadow-sm h-100">
+                                <i class="bi bi-people fs-1 text-primary"></i>
+                                <h5 class="mt-3">Users</h5>
+                                <p>View, edit, and assign roles to system users.</p>
+                                <a asp-controller="Admin" asp-action="Users" class="btn btn-outline-primary btn-sm">Manage Users</a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mb-4">
+                            <div class="p-4 bg-light border rounded-3 shadow-sm h-100">
+                                <i class="bi bi-person-lock fs-1 text-success"></i>
+                                <h5 class="mt-3">Roles</h5>
+                                <p>View and configure user roles & permissions.</p>
+                                <a asp-controller="Admin" asp-action="Roles" class="btn btn-outline-success btn-sm">Manage Roles</a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mb-4">
+                            <div class="p-4 bg-light border rounded-3 shadow-sm h-100">
+                                <i class="bi bi-gear fs-1 text-secondary"></i>
+                                <h5 class="mt-3">Settings</h5>
+                                <p>System preferences and general configurations.</p>
+                                <a href="#" class="btn btn-outline-secondary btn-sm disabled">Coming Soon</a>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
