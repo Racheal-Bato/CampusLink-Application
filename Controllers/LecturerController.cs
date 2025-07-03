@@ -13,7 +13,7 @@ namespace CampusLink_Application.Controllers
         {
             _context = context;
         }
-        [Authorize(Roles = "Admin")]
+       
 
         public IActionResult List()
         {
@@ -23,7 +23,7 @@ namespace CampusLink_Application.Controllers
 
             return View(lecturers);
         }
-        [Authorize(Roles = "Lecturer")]
+        
 
         public IActionResult Register()
         {
@@ -72,7 +72,7 @@ namespace CampusLink_Application.Controllers
             }
             return RedirectToAction("List");
         }
-        [Authorize(Roles = "Admin")]
+        
 
         public IActionResult Delete(int id)
         {

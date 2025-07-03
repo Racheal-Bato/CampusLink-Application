@@ -23,7 +23,8 @@ namespace CampusLink_Application.Models
         public int CourseId { get; set; }         // One-to-Many
         public Course Course { get; set; }
 
-        public int DepartmentId { get; set; }     // One-to-Many
+        public int DepartmentId { get; set; }
+        [ForeignKey("DepartmentId")]// One-to-Many
         public Department Department { get; set; }
 
         [NotMapped]
@@ -31,7 +32,7 @@ namespace CampusLink_Application.Models
         public ApplicationUser? ApplicationUser { get; set; }
 
         [Required]
-        public string Role { get; set; } // 👈 Add this
+        public string Role { get; set; } = string.Empty;// 👈 Add this
 
         public string? RegistrationNumber { get; set; } // 👈 For Student
       

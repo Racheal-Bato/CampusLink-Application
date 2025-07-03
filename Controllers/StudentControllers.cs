@@ -7,6 +7,7 @@ using System.Linq;
 
 namespace CampusLink_Application.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class StudentsController : Controller
     {
         private readonly AppDbContext _context;
@@ -20,7 +21,7 @@ namespace CampusLink_Application.Controllers
         {
             return View();
         }
-        [Authorize(Roles = "Admin")]
+        
 
         public IActionResult List()
         {
@@ -30,7 +31,7 @@ namespace CampusLink_Application.Controllers
                 .ToList();
             return View(students);
         }
-        [Authorize(Roles = "Student")]
+       
 
         public IActionResult Register()
         {
@@ -94,7 +95,7 @@ namespace CampusLink_Application.Controllers
         }
 
 
-        [Authorize(Roles = "Admin")]
+       
 
         public IActionResult Delete(int id)
         {

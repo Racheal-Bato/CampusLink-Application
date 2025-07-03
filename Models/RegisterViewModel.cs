@@ -32,10 +32,11 @@ namespace CampusLink_Application.Models
         public string ConfirmPassword { get; set; }
 
         [Required]
-        public string Role { get; set; } // 👈 Add this
+        public string Role { get; set; } 
 
-        public string? RegistrationNumber { get; set; } // 👈 For Student
-        public string? Department { get; set; } // 👈 For Lecturer
+        public string? RegistrationNumber { get; set; } 
+        public int CourseId { get; set; }
+        public string? Department { get; set; } 
 
         public bool AgreeToTerms { get; set; }
     }

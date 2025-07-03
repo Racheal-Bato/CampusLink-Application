@@ -5,6 +5,7 @@ using CampusLink_Application.Data;
 using CampusLink_Application.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
@@ -33,9 +34,18 @@ namespace CampusLink_Application.Controllers
         // GET: /Account/Register
         public IActionResult Register()
         {
-            ViewBag.Roles = new List<string> { "Student", "Lecturer" };
+            ViewBag.Roles = new SelectList(new List<string> { "Student", "Lecturer" });
+
+
+
+            ViewBag.Courses = new SelectList(_context.Courses, "CourseId", "CourseName");
             ViewBag.Departments = _context.Departments.Select(d => d.DepartmentName).ToList();
-            
+
+           
+
+
+
+
             return View();
         }
 
@@ -43,9 +53,9 @@ namespace CampusLink_Application.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            ViewBag.Roles = new List<string> { "Student", "Lecturer" };
-            ViewBag.Departments = _context.Departments.Select(d => d.DepartmentName).ToList();
-
+             ViewBag.Roles = new SelectList(new List<string> { "Student", "Lecturer" });
+             ViewBag.Courses = new SelectList(_context.Courses, "CourseId", "CourseName");
+             ViewBag.Departments = _context.Departments.Select(d => d.DepartmentName).ToList();
             if (!ModelState.IsValid)
                 return View(model);
 
@@ -71,7 +81,13 @@ namespace CampusLink_Application.Controllers
             {
                 var student = new Student
                 {
-                    RegNo = model.RegistrationNumber
+                    Role = "Student",
+
+                    CourseId = model.CourseId,
+                    RegNo = model.RegistrationNumber,
+                    DepartmentId = model.Id,
+
+
                 };
 
                 _context.Students.Add(student);

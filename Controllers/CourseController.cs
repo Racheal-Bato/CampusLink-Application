@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CampusLink_Application.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CourseController:Controller
     {
         private readonly AppDbContext _context;
@@ -15,7 +16,7 @@ namespace CampusLink_Application.Controllers
             _context = context;
         }
 
-        [Authorize]
+     
         public IActionResult List()
         {
 
@@ -71,7 +72,7 @@ namespace CampusLink_Application.Controllers
             }
             return RedirectToAction("List");
         }
-        [Authorize(Roles = "Admin")]
+        
         public IActionResult Delete(int id)
         {
             var course = _context.Courses.Find(id);

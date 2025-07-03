@@ -4,94 +4,35 @@
 }
 
 @section Styles {
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            overflow-x: hidden;
-        }
-
-        /* Background image */
-        .hero-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: url('/images/campus-background.jpg') no-repeat center center;
-            background-size: cover;
-            z-index: -3; /* lower so it stays behind everything */
-        }
-
-        /* Semi-transparent overlay */
-        .hero-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: -2; /* must be behind navbar and content */
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: calc(100vh - 56px); /* adjust if navbar height changes */
-            color: #f0f0f0;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.7);
-            padding: 0 1rem;
-        }
-
-            .hero-content h1 {
-                font-size: 3.5rem;
-                font-weight: 700;
-                margin-bottom: 0.75rem;
-                color: #ffe66d;
-            }
-
-            .hero-content p {
-                font-size: 1.25rem;
-                margin-bottom: 2rem;
-                max-width: 600px;
-                text-align: center;
-                color: #e0e0e0;
-            }
-
-            .hero-content .btn-primary {
-                background-color: #198754;
-                border-color: #198754;
-                color: #fff;
-            }
-
-                .hero-content .btn-primary:hover {
-                    background-color: #157347;
-                    border-color: #146c43;
-                }
-
-            .hero-content .btn-outline-success {
-                color: #198754;
-                border-color: #198754;
-            }
-
-                .hero-content .btn-outline-success:hover {
-                    background-color: rgba(25,135,84,0.1);
-                }
-    </style>
+    <link href="~/css/homepage.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+   
+    
 }
 
 <div class="hero-bg"></div>
 <div class="hero-overlay"></div>
 
 <div class="hero-content container text-center">
-    <h1>Welcome to CampusLink</h1>
-    <p>Your one-stop portal for managing students, courses, lecturers, and departments with ease.</p>
-    <div>
+    <h1 data-aos="fade-up">Welcome to CampusLink</h1>
+    <p data-aos="fade-up" data-aos-delay="200">
+        Your one-stop portal for managing students, courses, lecturers, and departments with ease.
+    </p>
+    <div data-aos="zoom-in" data-aos-delay="400">
         <a asp-controller="Account" asp-action="LogIn" class="btn btn-lg btn-primary me-3">Log In</a>
         <a asp-controller="Account" asp-action="Register" class="btn btn-lg btn-outline-success">Sign Up</a>
     </div>
 </div>
+
+<svg class="bottom-wave" viewBox="0 0 1440 320">
+    <path fill="#ffffff" fill-opacity="1"
+          d="M0,128L48,160C96,192,192,256,288,272C384,288,480,256,576,213.3C672,171,768,117,864,122.7C960,128,1056,192,1152,197.3C1248,203,1344,149,1392,122.7L1440,96L1440,320L0,320Z">
+    </path>
+</svg>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
+}
