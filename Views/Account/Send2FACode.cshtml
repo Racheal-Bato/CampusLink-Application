@@ -1,0 +1,17 @@
+﻿@model CampusLink_Application.ViewModels.Verify2FAVm
+
+
+
+
+<h2>Two-Factor Authentication</h2>
+<form asp-action="Send2FACode" method="post">
+    <div class="form-group">
+        <label asp-for="Code"></label>
+        <input asp-for="Code" class="form-control" />
+        <span asp-validation-for="Code" class="text-danger"></span>
+    </div>
+    <input type="hidden" asp-for="ReturnUrl" />
+    <input type="hidden" asp-for="RememberMe" />
+
+    <button type="submit" class="btn btn-primary">Verify</button>
+</form>

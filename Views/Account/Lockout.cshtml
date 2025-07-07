@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Account Locked";
+    Layout = "_Layout";
+}
+
+<div class="text-center mt-5">
+    <h2>Your account is locked</h2>
+    <p>
+        Too many failed login attempts. For your security, your account has been locked for 20 minutes.
+        Please try again later or contact support if you need help.
+    </p>
+    <a asp-action="Login" class="btn btn-primary">Back to Login</a>
+</div>

@@ -12,8 +12,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 
 // Add Identity services
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()  // You can customize the user class later if you want
-    .AddEntityFrameworkStores<AppDbContext>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    // Lock out users after 5 failed attempts
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    // Lockout duration: 20 minutes
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(20);
+    // Enable lockout for newly created users
+    options.Lockout.AllowedForNewUsers = true;
+
+
+}).AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
 //This tells ASP.NET Identity to block login unless the user has confirmed their email.
@@ -25,6 +34,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+
 
 
 builder.Services.AddControllersWithViews();

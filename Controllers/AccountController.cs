@@ -3,11 +3,12 @@
 using CampusLink.Models;
 using CampusLink_Application.Data;
 using CampusLink_Application.Models;
+using CampusLink_Application.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace CampusLink_Application.Controllers
 {
@@ -18,7 +19,6 @@ namespace CampusLink_Application.Controllers
         private readonly IEmailSender _emailSender;
         private readonly AppDbContext _context;
 
-        // ✅ FIX: Inject _context in the constructor
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
@@ -35,27 +35,21 @@ namespace CampusLink_Application.Controllers
         public IActionResult Register()
         {
             ViewBag.Roles = new SelectList(new List<string> { "Student", "Lecturer" });
-
-
-
             ViewBag.Courses = new SelectList(_context.Courses, "CourseId", "CourseName");
             ViewBag.Departments = _context.Departments.Select(d => d.DepartmentName).ToList();
-
-           
-
-
-
 
             return View();
         }
 
         // POST: /Account/Register
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-             ViewBag.Roles = new SelectList(new List<string> { "Student", "Lecturer" });
-             ViewBag.Courses = new SelectList(_context.Courses, "CourseId", "CourseName");
-             ViewBag.Departments = _context.Departments.Select(d => d.DepartmentName).ToList();
+            ViewBag.Roles = new SelectList(new List<string> { "Student", "Lecturer" });
+            ViewBag.Courses = new SelectList(_context.Courses, "CourseId", "CourseName");
+            ViewBag.Departments = _context.Departments.Select(d => d.DepartmentName).ToList();
+
             if (!ModelState.IsValid)
                 return View(model);
 
@@ -65,7 +59,6 @@ namespace CampusLink_Application.Controllers
                 Email = model.Email
             };
 
-            // ✅ First create the user account
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (!result.Succeeded)
@@ -76,30 +69,37 @@ namespace CampusLink_Application.Controllers
                 return View(model);
             }
 
-            // ✅ Role logic: Determine what role the user selected
+            // Role-specific setup
             if (model.Role == "Student")
             {
+                // Look up department from selected department name
+                var department = await _context.Departments
+                    .FirstOrDefaultAsync(d => d.DepartmentName == model.Department);
+
+                if (department == null)
+                {
+                    ModelState.AddModelError("", "Invalid department selected.");
+                    return View(model);
+                }
+
                 var student = new Student
                 {
                     Role = "Student",
-
                     CourseId = model.CourseId,
                     RegNo = model.RegistrationNumber,
-                    DepartmentId = model.Id,
-
-
+                    DepartmentId = department.Id, // ✅ Correct department FK
                 };
 
                 _context.Students.Add(student);
                 await _context.SaveChangesAsync();
 
                 user.StudentId = student.Id;
-                await _userManager.UpdateAsync(user); // ✅ Save link
+                await _userManager.UpdateAsync(user);
                 await _userManager.AddToRoleAsync(user, "Student");
             }
+
             else if (model.Role == "Lecturer")
             {
-                // ✅ Get the department object first
                 var department = await _context.Departments
                     .FirstOrDefaultAsync(d => d.DepartmentName == model.Department);
 
@@ -118,19 +118,13 @@ namespace CampusLink_Application.Controllers
                 await _context.SaveChangesAsync();
 
                 user.LecturerId = lecturer.Id;
-                await _userManager.UpdateAsync(user); // ✅ Save link
+                await _userManager.UpdateAsync(user);
                 await _userManager.AddToRoleAsync(user, "Lecturer");
             }
-            if (model.Role == "Admin")
-            {
 
-            }
-                // ✅ Send confirmation email
-                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmationLink = Url.Action(
-                "ConfirmEmail", "Account",
-                new { userId = user.Id, token },
-                protocol: HttpContext.Request.Scheme);
+            // Email Confirmation with 2FA Enabled after confirmation
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var confirmationLink = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, token }, Request.Scheme);
 
             await _emailSender.SendEmailAsync(
                 model.Email,
@@ -143,9 +137,9 @@ namespace CampusLink_Application.Controllers
 
         // GET: /Account/ConfirmEmail
         [HttpGet]
-        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        public async Task<IActionResult> ConfirmEmail(string? userId, string? token)
         {
-            if (userId == null || token == null)
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
                 return RedirectToAction("Index", "Home");
 
             var user = await _userManager.FindByIdAsync(userId);
@@ -155,6 +149,7 @@ namespace CampusLink_Application.Controllers
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (result.Succeeded)
             {
+                await _userManager.SetTwoFactorEnabledAsync(user, true);
                 TempData["Success"] = "Email confirmed! You can now log in.";
                 return RedirectToAction("Login");
             }
@@ -164,14 +159,12 @@ namespace CampusLink_Application.Controllers
         }
 
         // GET: /Account/Login
-        public IActionResult Login()
-        {
-            return View();
-        }
+        public IActionResult Login() => View();
 
         // POST: /Account/Login
         [HttpPost]
-        public async Task<IActionResult> Login(LogInViewModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LogInViewModel model, string? returnUrl = null)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -184,20 +177,152 @@ namespace CampusLink_Application.Controllers
             }
 
             var result = await _signInManager.PasswordSignInAsync(
-                user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+                user.UserName!, model.Password, model.RememberMe, lockoutOnFailure: true);
+
+            if (result.RequiresTwoFactor)
+            {
+                return RedirectToAction("Send2FACode", new { returnUrl, rememberMe = model.RememberMe });
+            }
 
             if (result.Succeeded)
-                return RedirectToAction("Index", "Home");
+                return RedirectToLocal(returnUrl);
+
+            if (result.IsLockedOut)
+                return View("Lockout");
 
             ModelState.AddModelError("", "Invalid login attempt.");
             return View(model);
         }
 
-        // GET: /Account/Logout
+        // GET: /Account/Send2FACode
+        [HttpGet]
+        public async Task<IActionResult> Send2FACode(string? returnUrl, bool rememberMe = false)
+        {
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (user == null)
+                return View("Error");
+
+            var token = await _userManager.GenerateTwoFactorTokenAsync(user, TokenOptions.DefaultEmailProvider);
+
+            await _emailSender.SendEmailAsync(
+                user.Email!,
+                "Your 2FA Code",
+                $"Your security code is: <strong>{token}</strong>");
+
+            return View(new Verify2FAVm { ReturnUrl = returnUrl, RememberMe = rememberMe });
+        }
+
+        // POST: /Account/Send2FACode
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Send2FACode(Verify2FAVm model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (user == null)
+                return View("Error");
+
+            var result = await _signInManager.TwoFactorSignInAsync(
+                TokenOptions.DefaultEmailProvider,
+                model.Code,
+                model.RememberMe,
+                rememberClient: false);
+
+            if (result.Succeeded)
+                return RedirectToLocal(model.ReturnUrl);
+
+            if (result.IsLockedOut)
+                return View("Lockout");
+
+            ModelState.AddModelError("", "Invalid code.");
+            return View(model);
+        }
+
+        // GET: /Account/ForgotPassword
+        [HttpGet]
+        public IActionResult ForgotPassword() => View();
+
+        // POST: /Account/ForgotPassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                return RedirectToAction("ForgotPasswordConfirmation");
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var callbackUrl = Url.Action("ResetPassword", "Account", new { token, email = model.Email }, Request.Scheme);
+
+            await _emailSender.SendEmailAsync(
+                model.Email,
+                "Reset Password",
+                $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
+
+            return RedirectToAction("ForgotPasswordConfirmation");
+        }
+
+        // GET: /Account/ResetPassword
+        [HttpGet]
+        public IActionResult ResetPassword(string? token, string? email)
+        {
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
+                return RedirectToAction("Index", "Home");
+
+            return View(new ResetPasswordViewModel { Token = token, Email = email });
+        }
+
+        // POST: /Account/ResetPassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                return RedirectToAction("ResetPasswordConfirmation");
+
+            var result = await _userManager.ResetPasswordAsync(user, model.Token!, model.Password);
+            if (result.Succeeded)
+                return RedirectToAction("Login");
+
+            foreach (var error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPasswordConfirmation() => View();
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ForgotPasswordConfirmationPost()
+            => RedirectToAction("ForgotPasswordConfirmation");
+
+        [HttpGet]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Login");
         }
+
+        private IActionResult RedirectToLocal(string? returnUrl)
+        {
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+
+            return RedirectToAction("Index", "Home");
+        }
     }
+
+   
 }

@@ -1,0 +1,54 @@
+﻿namespace CampusLink_Application.wwwroot.css
+body {
+    background: linear-gradient(120deg, #e0f7fa, #80deea);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.reset-container {
+    max-width: 500px;
+    margin: 5rem auto;
+    background: #ffffff;
+    padding: 2rem 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+    .reset-container h2 {
+        text-align: center;
+        color: #007bff;
+        margin-bottom: 1rem;
+    }
+
+label {
+    font-weight: 600;
+}
+
+.btn-primary {
+    width: 100%;
+    border-radius: 30px;
+    padding: 0.6rem;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+}
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.validation-summary-errors {
+    color: red;
+    margin-top: 1rem;
+}
