@@ -1,72 +1,159 @@
-﻿@model List<CampusLink_Application.Models.Student>
+﻿@model X.PagedList.IPagedList<CampusLink_Application.Models.Student>
+@using X.PagedList.Mvc.Core
+@using X.PagedList
 
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Student List";
 }
 
-<h2 class="text-secondary mb-4">Registered Students</h2>
+<h2 class="text-secondary mb-4 text-center">📘 Registered Students</h2>
 
 @if (!Model.Any())
 {
-    <p class="text-muted">No students registered yet.</p>
+    <div class="alert alert-warning text-center shadow-sm">
+        <i class="bi bi-info-circle"></i> No students registered yet.
+    </div>
 }
 else
 {
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-
-                <th>Gender</th>
-                <th>Age</th>
-                <th>Date of Birth</th>
-                <th>Registration Number</th>
-                <th>Email Address</th>
-                <th>Phone Number</th>
-                <th>Course</th>
-                <th>Department</th>
-                <th>Profile Image</th>
-                <th>Action</th>
-                
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var student in Model)
-            {
+    <div class="table-responsive rounded shadow-sm">
+        <table class="table table-hover table-striped align-middle text-center" style="font-size: 0.875rem; border-collapse: collapse;">
+            <thead class="table-primary">
                 <tr>
-
-                    <td>@student.Id</td>
-                    <td>@student.FirstName</td>
-                    <td>@student.LastName</td>
-                    <td>@student.Gender</td>
-                    <td>@student.Age</td>
-                    <td>@student.BirthDate</td>
-                    <td>@student.RegNo</td>
-                    <td>@student.EmailAdress</td>
-                    <td>@student.PhoneNumber</td>
-                    <td>@student.Course?.CourseName</td>
-                    <td>@student.Department?.DepartmentName</td>
-
-                    <td>
-                        @if (student.ProfileImage != null)
-                        {
-                            <img src="data:image/png;base64,@Convert.ToBase64String(student.ProfileImage)" width="100" />
-                        }
-                        else
-                        {
-                            <span>No Image</span>
-                        }
-
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@student.Id" class="btn btn-sm btn-warning">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@student.Id" class="btn btn-sm btn-danger">Delete</a>
-                    </td>
+                    <th style="border: 1px solid #dee2e6;">ID</th>
+                    <th style="border: 1px solid #dee2e6;">First Name</th>
+                    <th style="border: 1px solid #dee2e6;">Last Name</th>
+                    <th style="border: 1px solid #dee2e6;">Gender</th>
+                    <th style="border: 1px solid #dee2e6;">Age</th>
+                    <th style="border: 1px solid #dee2e6;">DOB</th>
+                    <th style="border: 1px solid #dee2e6;">Reg No.</th>
+                    <th style="border: 1px solid #dee2e6;">Email</th>
+                    <th style="border: 1px solid #dee2e6;">Phone</th>
+                    <th style="border: 1px solid #dee2e6;">Course</th>
+                    <th style="border: 1px solid #dee2e6;">Department</th>
+                    <th style="border: 1px solid #dee2e6;">Image</th>
+                    <th style="border: 1px solid #dee2e6;">Actions</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var student in Model)
+                {
+                    <tr>
+                        <td class="py-1" style="border: 1px solid #dee2e6;">@student.Id</td>
+                        <td class="py-1" style="border: 1px solid #dee2e6;">@student.FirstName</td>
+                        <td class="py-1" style="border: 1px solid #dee2e6;">@student.LastName</td>
+                        <td class="py-1" style="border: 1px solid #dee2e6;">@student.Gender</td>
+                        <td class="py-1" style="border: 1px solid #dee2e6;">@student.Age</td>
+                        <td class="py-1" style="border: 1px solid #dee2e6;">@student.BirthDate?.ToShortDateString() ?? "N/A"</td>
+                        <td class="py-1" style="border: 1px solid #dee2e6;">@student.RegNo</td>
+                        <td class="py-1" style="border: 1px solid #dee2e6;">@student.EmailAdress</td>
+                        <td class="py-1" style="border: 1px solid #dee2e6;">@student.PhoneNumber</td>
+                        <td class="py-1" style="border: 1px solid #dee2e6;">@student.Course?.CourseName</td>
+                        <td class="py-1" style="border: 1px solid #dee2e6;">@student.Department?.DepartmentName</td>
+                        <td class="py-1" style="border: 1px solid #dee2e6;">
+                            @if (student.ProfileImage != null)
+                            {
+                                <img src="data:image/png;base64,@Convert.ToBase64String(student.ProfileImage)" width="60" height="60" class="rounded-circle shadow-sm" style="object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <span class="text-muted">No Image</span>
+                            }
+                        </td>
+                        <td class="py-1" style="border: 1px solid #dee2e6;">
+                            <a asp-action="Edit" asp-route-id="@student.Id" class="btn btn-sm btn-outline-warning me-1">✏️ Edit</a>
+                            <a asp-action="Delete" asp-route-id="@student.Id" class="btn btn-sm btn-outline-danger">🗑️ Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Custom Pagination -->
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm">
+                @if (Model.HasPreviousPage)
+                {
+                    <li class="page-item"><a class="page-link" href="@Url.Action("List", new { page = 1 })">« First</a></li>
+                    <li class="page-item"><a class="page-link" href="@Url.Action("List", new { page = Model.PageNumber - 1 })">‹ Prev</a></li>
+                }
+                else
+                {
+                    <li class="page-item disabled"><span class="page-link">« First</span></li>
+                    <li class="page-item disabled"><span class="page-link">‹ Prev</span></li>
+                }
+
+                @for (int i = 1; i <= Model.PageCount; i++)
+                {
+                    if (i == Model.PageNumber)
+                    {
+                        <li class="page-item active"><span class="page-link">@i</span></li>
+                    }
+                    else
+                    {
+                        <li class="page-item"><a class="page-link" href="@Url.Action("List", new { page = i })">@i</a></li>
+                    }
+                }
+
+                @if (Model.HasNextPage)
+                {
+                    <li class="page-item"><a class="page-link" href="@Url.Action("List", new { page = Model.PageNumber + 1 })">Next ›</a></li>
+                    <li class="page-item"><a class="page-link" href="@Url.Action("List", new { page = Model.PageCount })">Last »</a></li>
+                }
+                else
+                {
+                    <li class="page-item disabled"><span class="page-link">Next ›</span></li>
+                    <li class="page-item disabled"><span class="page-link">Last »</span></li>
+                }
+            </ul>
+        </nav>
+    </div>
 }
-<button type="button" onclick="window.location.href='/'" class="btn btn-danger ms-lg-5">Exit</button>
+
+<!-- Exit Button -->
+<div class="text-end mt-4">
+    <button onclick="window.location.href='/'" class="btn btn-outline-secondary shadow-sm">🚪 Exit</button>
+</div>
+
+<style>
+    th, td {
+        vertical-align: middle;
+        border-collapse: collapse;
+    }
+
+    /* Pagination styles */
+    .pagination .page-link {
+        color: #0d6efd;
+        border-radius: 0.3rem;
+        margin: 0 3px;
+        padding: 0.3rem 0.6rem;
+        font-weight: 500;
+        border: 1px solid transparent;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+        .pagination .page-link:hover:not(.disabled) {
+            background-color: #e9f1ff;
+            color: #0a58ca;
+        }
+
+    .pagination .page-item.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: #fff;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        color: #adb5bd;
+        cursor: default;
+    }
+
+    /* Reduce padding in table cells */
+    table.table td, table.table th {
+        padding: 0.35rem 0.5rem;
+        border: 1px solid #dee2e6;
+    }
+</style>

@@ -3,6 +3,7 @@ using CampusLink_Application.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
+using X.PagedList.Extensions;
 
 
 namespace CampusLink_Application.Controllers
@@ -16,15 +17,20 @@ namespace CampusLink_Application.Controllers
         {
             _context = context;
         }
-      
 
-        public IActionResult List()
+
+        public IActionResult List(int? page)
         {
-            var departments = _context.Departments.ToList();
+            int pageSize = 5;
+            int pageNumber = page ?? 1;
+
+            var departments = _context.Departments
+                .OrderBy(d => d.DepartmentName) // Sort alphabetically
+                .ToPagedList(pageNumber, pageSize);
 
             return View(departments);
         }
-        
+
         public IActionResult Register()
         {
            

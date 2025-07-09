@@ -1,4 +1,7 @@
-﻿@model List<CampusLink_Application.Models.Course>
+﻿@model X.PagedList.IPagedList<CampusLink_Application.Models.Course>
+@using X.PagedList
+@using X.PagedList.Mvc.Core
+
 
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
@@ -41,6 +44,17 @@
                 }
             </tbody>
         </table>
+        <div class="d-flex justify-content-center">
+    @Html.PagedListPager(Model, page => Url.Action("List", new { page }),
+        new PagedListRenderOptions
+        {
+            LiElementClasses = new[] { "page-item" },
+            PageClasses = new[] { "page-link" },
+            UlElementClasses = new[] { "pagination" },
+            Display = PagedListDisplayMode.IfNeeded
+        })
+</div>
+
     }
     else
     {

@@ -1,8 +1,10 @@
 ﻿using CampusLink.Models;
 using CampusLink_Application.Models;
+using CampusLink_Application.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using X.PagedList.Extensions;
 
 [Authorize(Roles = "Admin")]
 public class AdminController : Controller
@@ -58,5 +60,33 @@ public class AdminController : Controller
 
         return RedirectToAction("Index");
     }
-    
+    // GET: Admin/Users/List?page=1
+
+    public async Task<IActionResult> List(int? page)
+    {
+        int pageSize = 10;
+        int pageNumber = page ?? 1;
+
+        var users = _userManager.Users.ToList();
+
+        // Prepare a list of user info with roles
+        var userRoleViewModels = new List<UserRoleViewModel>();
+
+        foreach (var user in users)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            userRoleViewModels.Add(new UserRoleViewModel
+            {
+                User = user,
+                Roles = roles
+            });
+        }
+
+        var pagedUsers = userRoleViewModels.ToPagedList(pageNumber, pageSize);
+
+        return View(pagedUsers);
+    }
+
+
+
 }

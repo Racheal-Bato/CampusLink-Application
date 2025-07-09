@@ -32,8 +32,23 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 
+
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(20); // ? 20 minutes timeout
+    options.SlidingExpiration = true; // Resets timeout if there's activity
+    options.LoginPath = "/Account/Login"; // Adjust if you renamed the login page
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(20); // Same timeout as cookie
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 
 
 
@@ -97,6 +112,8 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseSession();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

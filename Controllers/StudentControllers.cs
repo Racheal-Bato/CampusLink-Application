@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using X.PagedList.Extensions;
+using X.PagedList;
 
 namespace CampusLink_Application.Controllers
 {
@@ -23,13 +25,20 @@ namespace CampusLink_Application.Controllers
         }
         
 
-        public IActionResult List()
+        public IActionResult List(int? page)
         {
+           
+
+            int pageSize = 5; // students per page
+            int pageNumber = page ?? 1;
+
             var students = _context.Students
                 .Include(s => s.Course)
                 .Include(s => s.Department)
-                .ToList();
-            return View(students);
+                .OrderBy(s => s.RegNo); // or any sort field
+
+            var pagedStudents = students.ToPagedList(pageNumber, pageSize);
+            return View(pagedStudents);
         }
        
 

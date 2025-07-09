@@ -1,4 +1,5 @@
-﻿namespace CampusLink_Application.Models
+﻿
+namespace CampusLink_Application.Models
 {
     public class Course
     {

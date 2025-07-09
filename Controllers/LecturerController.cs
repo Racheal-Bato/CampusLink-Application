@@ -3,6 +3,8 @@ using CampusLink_Application.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using X.PagedList;
+using X.PagedList.Extensions;
 namespace CampusLink_Application.Controllers
 {
     public class LecturerController:Controller
@@ -13,17 +15,22 @@ namespace CampusLink_Application.Controllers
         {
             _context = context;
         }
-       
 
-        public IActionResult List()
+
+        public IActionResult List(int? page)
         {
+            int pageSize = 10;
+            int pageNumber = page ?? 1;
+
             var lecturers = _context.Lecturers
-                .Include(l => l.Department)
-                .ToList();
+                .Include(l => l.Department) // Optional: eager load department
+                .OrderBy(l => l.FirstName)
+                .ToPagedList(pageNumber, pageSize);
 
             return View(lecturers);
         }
-        
+
+
 
         public IActionResult Register()
         {

@@ -1,0 +1,57 @@
+﻿@model X.PagedList.IPagedList<CampusLink_Application.ViewModels.UserRoleViewModel>
+
+
+@using X.PagedList.Mvc.Core
+@{
+    ViewData["Title"] = "Manage Users";
+}
+
+<h2>Manage Users</h2>
+
+@if (!Model.Any())
+{
+    <p>No users found.</p>
+}
+else
+{
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Email</th>
+                <th>Email Confirmed</th>
+                <th>Roles</th>
+                <th>Lockout Enabled</th>
+                <th>Lockout End</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.User.Email</td>
+                    <td>@item.User.EmailConfirmed</td>
+                    <td>@string.Join(", ", item.Roles)</td>
+                    <td>@item.User.LockoutEnabled</td>
+                    <td>@(item.User.LockoutEnd?.ToLocalTime().ToString("g") ?? "N/A")</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.User.Id" class="btn btn-sm btn-primary">Edit</a>
+                        <a asp-action="LockUnlock" asp-route-id="@item.User.Id" class="btn btn-sm btn-warning">Lock/Unlock</a>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+
+     <div class="d-flex justify-content-center">
+        @Html.PagedListPager(Model, page => Url.Action("List", new { page }),
+        new PagedListRenderOptions
+        {
+            LiElementClasses = new[] { "page-item" },
+            PageClasses = new[] { "page-link" },
+            UlElementClasses = new[] { "pagination" },
+            Display = PagedListDisplayMode.IfNeeded
+        })
+    </div>
+}

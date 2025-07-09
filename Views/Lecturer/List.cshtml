@@ -1,4 +1,6 @@
-﻿@model IEnumerable<CampusLink_Application.Models.Lecturer>
+﻿@model X.PagedList.IPagedList<CampusLink_Application.Models.Lecturer>
+@using X.PagedList
+@using X.PagedList.Mvc.Core
 
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
@@ -59,4 +61,15 @@
             }
         </tbody>
     </table>
+    <div class="d-flex justify-content-center mt-3">
+        @Html.PagedListPager(Model, page => Url.Action("List", new { page }),
+        new PagedListRenderOptions
+        {
+            LiElementClasses = new[] { "page-item" },
+            PageClasses = new[] { "page-link" },
+            UlElementClasses = new[] { "pagination justify-content-center" },
+            Display = PagedListDisplayMode.IfNeeded
+        })
+    </div>
+
 </div>
