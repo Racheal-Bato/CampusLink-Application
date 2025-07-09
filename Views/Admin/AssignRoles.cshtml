@@ -1,0 +1,27 @@
+﻿
+@model CampusLink_Application.ViewModels.AssignRolesViewModel
+@{
+    ViewData["Title"] = "Assign Roles";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Assign Roles to @Model.Email</h2>
+
+<form asp-action="AssignRoles" method="post">
+    <input type="hidden" asp-for="UserId" />
+
+    <div class="form-group mb-3">
+        @foreach (var role in Model.AllRoles)
+        {
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox"
+                       name="Roles" value="@role"
+                       @(Model.Roles.Contains(role) ? "checked" : "") />
+                <label class="form-check-label">@role</label>
+            </div>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update Roles</button>
+    <a asp-action="List" class="btn btn-secondary">Cancel</a>
+</form>

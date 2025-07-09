@@ -1,0 +1,79 @@
+﻿namespace CampusLink_Application.wwwroot.css
+body {
+    background-color: #f8f9fa;
+}
+
+.settings-container {
+    margin-top: 70px;
+}
+
+/* Fixed top navbar (assumes it's already styled in _Layout.cshtml) */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+/* Fixed sidebar */
+.sidebar {
+    position: sticky;
+    top: 90px;
+    z-index: 1;
+}
+
+.settings-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+    .settings-card h3 {
+        margin-bottom: 2rem;
+    }
+
+.section-title {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: #495057;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+}
+
+.form-check-label {
+    margin-left: 0.5rem;
+}
+
+.list-group-item-action:hover {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.btn-primary {
+    padding: 0.6rem 2rem;
+    border-radius: 8px;
+}
+
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.form-check-input {
+    cursor: pointer;
+}
+
+.form-check-label {
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: static;
+    }
+}

@@ -1,0 +1,19 @@
+﻿@model CampusLink_Application.ViewModels.RoleViewModel
+
+@{
+    ViewData["Title"] = "Create Role";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Create New Role</h2>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Role Name</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="List" class="btn btn-secondary">Cancel</a>
+</form>

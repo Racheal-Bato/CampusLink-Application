@@ -1,57 +1,88 @@
 ﻿@model X.PagedList.IPagedList<CampusLink_Application.ViewModels.UserRoleViewModel>
-
-
 @using X.PagedList.Mvc.Core
 @{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Manage Users";
 }
 
-<h2>Manage Users</h2>
+<h2 class="mb-4 text-primary">Manage Users</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
 
 @if (!Model.Any())
 {
-    <p>No users found.</p>
+    <p class="text-muted">No users found.</p>
 }
 else
 {
-    <table class="table table-striped table-bordered">
+    <table class="table table-hover table-striped table-bordered text-sm">
         <thead class="table-dark">
             <tr>
+                <th>#</th>
                 <th>Email</th>
-                <th>Email Confirmed</th>
                 <th>Roles</th>
-                <th>Lockout Enabled</th>
-                <th>Lockout End</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @for (int i = 0; i < Model.Count; i++)
             {
+                var user = Model[i].User;
+                var roles = Model[i].Roles;
+
                 <tr>
-                    <td>@item.User.Email</td>
-                    <td>@item.User.EmailConfirmed</td>
-                    <td>@string.Join(", ", item.Roles)</td>
-                    <td>@item.User.LockoutEnabled</td>
-                    <td>@(item.User.LockoutEnd?.ToLocalTime().ToString("g") ?? "N/A")</td>
+                    <td>@(i + 1)</td>
+                    <td>@user.Email</td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.User.Id" class="btn btn-sm btn-primary">Edit</a>
-                        <a asp-action="LockUnlock" asp-route-id="@item.User.Id" class="btn btn-sm btn-warning">Lock/Unlock</a>
+                        @if (roles.Any())
+                        {
+                            @string.Join(", ", roles)
+                        }
+                        else
+                        {
+                            <span class="text-danger">No Role</span>
+                        }
+                    </td>
+                    <td>
+                        @if (user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.UtcNow)
+                        {
+                            <span class="badge bg-danger">Locked</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                    </td>
+                    <td>
+                        @if (user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.UtcNow)
+                        {
+                            <a asp-action="UnlockUser" asp-route-userId="@user.Id" class="btn btn-sm btn-success me-1">Unlock</a>
+                        }
+                        else
+                        {
+                            <a asp-action="LockUser" asp-route-userId="@user.Id" class="btn btn-sm btn-danger me-1">Lock</a>
+                        }
+
+              
+                        <a asp-action="AssignRoles" asp-route-userId="@user.Id" class="btn btn-sm btn-warning">Assign Roles</a>
+                        <a asp-action="Edit" asp-route-userId="@user.Id" class="btn btn-sm btn-info me-1">Edit</a>
                     </td>
                 </tr>
             }
-
         </tbody>
     </table>
 
-     <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center mt-3">
         @Html.PagedListPager(Model, page => Url.Action("List", new { page }),
         new PagedListRenderOptions
         {
             LiElementClasses = new[] { "page-item" },
             PageClasses = new[] { "page-link" },
-            UlElementClasses = new[] { "pagination" },
-            Display = PagedListDisplayMode.IfNeeded
+            UlElementClasses = new[] { "pagination", "justify-content-center" }
         })
-    </div>
+</div>
 }

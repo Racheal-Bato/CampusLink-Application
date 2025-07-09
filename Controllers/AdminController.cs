@@ -34,32 +34,7 @@ public class AdminController : Controller
         return RedirectToAction("Index");
     }
 
-    public async Task<IActionResult> EditUser(string id)
-    {
-        var user = await _userManager.FindByIdAsync(id);
-        var roles = await _userManager.GetRolesAsync(user);
-
-        var model = new EditUserViewModel
-        {
-            UserId = user.Id,
-            Email = user.Email,
-            CurrentRoles = roles.ToList(),
-            AllRoles = _roleManager.Roles.Select(r => r.Name).ToList()
-        };
-        return View(model);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> EditUser(EditUserViewModel model)
-    {
-        var user = await _userManager.FindByIdAsync(model.UserId);
-        var currentRoles = await _userManager.GetRolesAsync(user);
-
-        await _userManager.RemoveFromRolesAsync(user, currentRoles);
-        await _userManager.AddToRolesAsync(user, model.SelectedRoles);
-
-        return RedirectToAction("Index");
-    }
+   
     // GET: Admin/Users/List?page=1
 
     public async Task<IActionResult> List(int? page)
@@ -86,7 +61,121 @@ public class AdminController : Controller
 
         return View(pagedUsers);
     }
+    public async Task<IActionResult> AssignRoles(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) return NotFound();
 
+        var userRoles = await _userManager.GetRolesAsync(user);
+        var allRoles = _roleManager.Roles.Select(r => r.Name).ToList();
 
+        var viewModel = new AssignRolesViewModel
+        {
+            UserId = user.Id,
+            Email = user.Email,
+            Roles = userRoles.ToList(),
+            AllRoles = allRoles
+        };
+
+        return View(viewModel);
+    }
+
+    // POST: AdminUsers/AssignRoles
+    [HttpPost]
+    public async Task<IActionResult> AssignRoles(AssignRolesViewModel model)
+    {
+        var user = await _userManager.FindByIdAsync(model.UserId);
+        if (user == null) return NotFound();
+
+        var currentRoles = await _userManager.GetRolesAsync(user);
+
+        var rolesToAdd = model.Roles.Except(currentRoles);
+        var rolesToRemove = currentRoles.Except(model.Roles);
+
+        await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
+        await _userManager.AddToRolesAsync(user, rolesToAdd);
+
+        TempData["Success"] = "Roles updated successfully!";
+        return RedirectToAction("List");
+    }
+    // LOCK USER
+    public async Task<IActionResult> LockUser(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) return NotFound();
+
+        // Lockout indefinitely
+        await _userManager.SetLockoutEnabledAsync(user, true);
+        await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+
+        TempData["Success"] = "User account locked.";
+        return RedirectToAction("List");
+    }
+
+    // UNLOCK USER
+    public async Task<IActionResult> UnlockUser(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) return NotFound();
+
+        await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow);
+        TempData["Success"] = "User account unlocked.";
+        return RedirectToAction("List");
+    }
+    // GET: AdminUsers/Edit/{userId}
+    public async Task<IActionResult> Edit(string userId)
+    {
+        if (string.IsNullOrEmpty(userId))
+            return NotFound();
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            return NotFound();
+
+        var model = new Edit
+        {
+            Id = user.Id,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
+            UserName = user.UserName
+        };
+
+        return View(model);
+    }
+
+    // POST: AdminUsers/Edit
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(Edit model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var user = await _userManager.FindByIdAsync(model.Id);
+        if (user == null)
+            return NotFound();
+
+        user.Email = model.Email;
+        user.PhoneNumber = model.PhoneNumber;
+        user.UserName = model.UserName;
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (result.Succeeded)
+        {
+            TempData["Success"] = "User details updated successfully.";
+            return RedirectToAction("List");
+        }
+
+        foreach (var error in result.Errors)
+            ModelState.AddModelError("", error.Description);
+
+        return View(model);
+    }
 
 }
+
+
+
+
+
